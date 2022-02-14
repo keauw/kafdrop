@@ -15,6 +15,10 @@ spring:
       fail_on_unknown_properties: false
       read_unknown_enum_values_as_null: true
 
+kafdropAdmin:
+  user: "${KAFDROP_USER:kafdropadmin}"
+  protectedKey: "${KAFDROP_PROTECTED_KEY:MaiRuM@iRuMa1Ru}"
+
 management:
   endpoints:
     web:
