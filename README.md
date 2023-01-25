@@ -365,3 +365,14 @@ To logout, browse to [/logout](http://localhost:8080/logout).
 
 # Contributing Guidelines
 All contributions are more than welcomed. Contributions may close an issue, fix a bug (reported or not reported), add new design blocks, improve the existing code, add new feature, and so on. In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone.
+
+
+
+#build package
+mvn clean package assembly:single
+
+#copy kafdrop-3.28.4-bin.tar.gz into docker-ready folder
+docker build -f ./Dockerfile -t keauw/kafdrop:3.28.4 .
+
+winpty docker login
+docker push keauw/kafdrop:3.28.4
