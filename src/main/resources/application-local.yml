@@ -1,0 +1,4 @@
+
+kafdropAdmin:
+  user: kafdropuser
+  protectedKey: password

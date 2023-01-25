@@ -26,6 +26,7 @@ public final class KafkaConfiguration {
   private String jaasConfig;
   private String clientCallback;
   private String iamEnabled;
+  private String saslEnabled;
 
   public void applyCommon(Properties properties) {
     properties.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokerConnect);
@@ -35,6 +36,16 @@ public final class KafkaConfiguration {
       LOG.info("Setting sasl mechanism to {}", saslMechanism);
       properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
       properties.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
+    }
+
+    LOG.info("Is SASL enabled : {}", saslEnabled);
+    if (Boolean.parseBoolean(saslEnabled)) {
+      LOG.info("Setting sasl.jaas.config {}", jaasConfig);
+      LOG.info("Setting security protocol to {}", securityProtocol);
+      LOG.info("Setting sasl mechanism to {}", saslMechanism);
+      properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
+      properties.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
+      properties.put(SaslConfigs.SASL_JAAS_CONFIG, jaasConfig);
     }
 
     LOG.info("Is iam enabled : {}", iamEnabled);
