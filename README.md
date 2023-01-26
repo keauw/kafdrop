@@ -367,7 +367,11 @@ To logout, browse to [/logout](http://localhost:8080/logout).
 All contributions are more than welcomed. Contributions may close an issue, fix a bug (reported or not reported), add new design blocks, improve the existing code, add new feature, and so on. In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone.
 
 
+# running in local
+vm argument : -DKAFDROP_USER=user -DKAFDROP_PROTECTED_KEY=password -DKAFKA_SASL_ENABLED=true -DKAFKA_JAAS_CONFIG="org.apache.kafka.common.security.plain.PlainLoginModule required username='admin' password='supersecure';"
 
+
+# build docker image 
 #build package
 mvn clean package assembly:single
 
