@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +26,22 @@ public class ProtobufDescriptorConfiguration {
     // detail screen
     private String directory;
 
+    private Boolean parseAnyProto = Boolean.FALSE;
+
     public String getDirectory() {
       return directory;
     }
 
     public void setDirectory(String directory) {
       this.directory = directory;
+    }
+
+    public Boolean getParseAnyProto() {
+      return parseAnyProto;
+    }
+
+    public void setParseAnyProto(Boolean parseAnyProto) {
+      this.parseAnyProto = parseAnyProto;
     }
 
     public List<String> getDescFilesList() {
@@ -43,17 +54,10 @@ public class ProtobufDescriptorConfiguration {
       File path = new File(directory);
 
       // apply filter for listing only .desc file
-      FilenameFilter filter = new FilenameFilter() {
-
-        @Override
-        public boolean accept(File dir, String name) {
-          return name.endsWith(".desc");
-        }
-
-      };
+      FilenameFilter filter = (dir, name) -> name.endsWith(".desc");
 
       pathnames = path.list(filter);
-      return Arrays.asList(pathnames);
+      return Arrays.asList(Objects.requireNonNull(pathnames));
     }
   }
 }

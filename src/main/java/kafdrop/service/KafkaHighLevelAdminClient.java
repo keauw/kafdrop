@@ -72,7 +72,7 @@ public final class KafkaHighLevelAdminClient {
   Set<String> listConsumerGroups() {
     final Collection<ConsumerGroupListing> groupListing;
     try {
-      groupListing = adminClient.listConsumerGroups().all().get();
+      groupListing = adminClient.listConsumerGroups().valid().get();
     } catch (InterruptedException | ExecutionException e) {
       throw new KafkaAdminClientException(e);
     }
@@ -110,6 +110,7 @@ public final class KafkaHighLevelAdminClient {
         return Map.of();
       } else if (e.getCause() instanceof TopicAuthorizationException) {
         printAcls();
+        return Map.of();
       }
       throw new KafkaAdminClientException(e);
     }
