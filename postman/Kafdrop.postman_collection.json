@@ -1,0 +1,170 @@
+{
+	"info": {
+		"_postman_id": "2c807a63-7b56-4860-b5ca-3f0363790cd8",
+		"name": "Kafdrop",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "984700"
+	},
+	"item": [
+		{
+			"name": "Send message - Local",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "kafdropadmin",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "MaiRuM@iRuMa1Ru",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"text\": \"hello world\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9100/producer/:topicName/messages?azpEvents_status=ARRA&azpEvents_substatus=SVACP&azpEvents_dispatchinterface=I3&azpEvents_subscriptioncountry=AUT",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9100",
+					"path": [
+						"producer",
+						":topicName",
+						"messages"
+					],
+					"query": [
+						{
+							"key": "messageKey",
+							"value": "",
+							"description": "optional",
+							"disabled": true
+						},
+						{
+							"key": "azpEvents_status",
+							"value": "ARRA",
+							"description": "optional custom header"
+						},
+						{
+							"key": "azpEvents_substatus",
+							"value": "SVACP",
+							"description": "optional custom header"
+						},
+						{
+							"key": "azpEvents_dispatchinterface",
+							"value": "I3",
+							"description": "optional custom header"
+						},
+						{
+							"key": "azpEvents_subscriptioncountry",
+							"value": "AUT",
+							"description": "optional custom header"
+						}
+					],
+					"variable": [
+						{
+							"key": "topicName",
+							"value": "tests"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send message - GTU Dev",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "kafdropadmin",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "MaiRuM@iRuMa1Ru",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"text\": \"hello world\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://kafdrop-gtu-dev.nonprod-blue-gw.apfr-acm-nonprod.ec1.aws.aztec.cloud.allianz/producer/:topicName/messages?azpEvents_status=ARRA&azpEvents_substatus=SVACP&azpEvents_dispatchinterface=I3&azpEvents_subscriptioncountry=AUT",
+					"protocol": "https",
+					"host": [
+						"kafdrop-gtu-dev",
+						"nonprod-blue-gw",
+						"apfr-acm-nonprod",
+						"ec1",
+						"aws",
+						"aztec",
+						"cloud",
+						"allianz"
+					],
+					"path": [
+						"producer",
+						":topicName",
+						"messages"
+					],
+					"query": [
+						{
+							"key": "messageKey",
+							"value": "",
+							"description": "optional",
+							"disabled": true
+						},
+						{
+							"key": "azpEvents_status",
+							"value": "ARRA"
+						},
+						{
+							"key": "azpEvents_substatus",
+							"value": "SVACP"
+						},
+						{
+							"key": "azpEvents_dispatchinterface",
+							"value": "I3"
+						},
+						{
+							"key": "azpEvents_subscriptioncountry",
+							"value": "AUT"
+						}
+					],
+					"variable": [
+						{
+							"key": "topicName",
+							"value": "dev.azp.gtu.locations"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
