@@ -20,6 +20,8 @@ package kafdrop;
 
 import com.google.common.base.*;
 import io.undertow.server.*;
+import io.undertow.server.handlers.DisallowedMethodsHandler;
+import io.undertow.util.HttpString;
 import io.undertow.websockets.jsr.*;
 import kafdrop.config.ini.*;
 import org.slf4j.*;
@@ -43,7 +45,7 @@ import java.util.stream.*;
 
 @SpringBootApplication
 public class Kafdrop {
-  private final static Logger LOG = LoggerFactory.getLogger(Kafdrop.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Kafdrop.class);
 
   public static void main(String[] args) {
     createApplicationBuilder()
@@ -64,6 +66,17 @@ public class Kafdrop {
         var inf = new WebSocketDeploymentInfo();
         inf.setBuffers(new DefaultByteBufferPool(false, 64));
         deploymentInfo.addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, inf);
+        // see https://stackoverflow.com/a/54129696
+        deploymentInfo.addInitialHandlerChainWrapper(new HandlerWrapper() {
+          @Override
+          public HttpHandler wrap(HttpHandler handler) {
+            HttpString[] disallowedHttpMethods = {
+              HttpString.tryFromString("TRACE"),
+              HttpString.tryFromString("TRACK")
+            };
+            return new DisallowedMethodsHandler(handler, disallowedHttpMethods);
+          }
+        });
       };
       factory.addDeploymentInfoCustomizers(customizer);
     };
@@ -99,8 +112,7 @@ public class Kafdrop {
         try {
           System.setProperty("logging.dir", new File(loggingFile).getParent());
         } catch (Exception ex) {
-          System.err.println("Unable to set up logging.dir from logging.file " + loggingFile + ": " +
-                                 Throwables.getStackTraceAsString(ex));
+          LOG.error("Unable to set up logging.dir from logging.file {}", loggingFile, ex);
         }
       }
       if (environment.containsProperty("debug") &&
