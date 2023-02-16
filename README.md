@@ -375,8 +375,8 @@ vm argument : -DKAFDROP_USER=user -DKAFDROP_PROTECTED_KEY=password -DKAFKA_SASL_
 #build package
 mvn clean package assembly:single
 
-#copy kafdrop-3.28.4-bin.tar.gz into docker-ready folder
-docker build -f ./Dockerfile -t keauw/kafdrop:3.28.4 .
+#copy kafdrop-3.28.5-bin.tar.gz into docker-ready folder
+docker build -f ./Dockerfile -t keauw/kafdrop:3.28.5 .
 
 winpty docker login
-docker push keauw/kafdrop:3.28.4
+docker push keauw/kafdrop:3.28.5

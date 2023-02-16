@@ -31,7 +31,7 @@ kafdrop.monitor:
   clientId: Kafdrop
 
 kafka:
-  brokerConnect: localhost:9092
+  brokerConnect: "${KAFKA_BROKERCONNECT:localhost:9092}"
   isSecured: "${KAFKA_IS_SECURED:false}"
   saslEnabled: "${KAFKA_SASL_ENABLED:false}"
   saslMechanism: "${KAFKA_SASL_MECHANISM:PLAIN}"
