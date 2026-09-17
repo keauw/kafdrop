@@ -7,11 +7,14 @@
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/obsidiandynamics/kafdrop.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/obsidiandynamics/kafdrop/context:java)
 
 
-<em>Kafdrop is a web UI for viewing Kafka topics and browsing consumer groups.</em> The tool displays information such as brokers, topics, partitions, consumers, and lets you view messages. 
+<em>Kafdrop is a web UI for viewing Kafka topics and browsing consumer groups.</em> The tool displays information such as brokers, topics, partitions, consumers, and lets you view messages.
 
 ![Overview Screenshot](docs/images/overview.png?raw=true)
 
-This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the world of JDK 11+, Kafka 2.x, Helm and Kubernetes. It's a lightweight application that runs on Spring Boot and is dead-easy to configure, supporting SASL and TLS-secured brokers.
+It's a lightweight application that runs on Spring Boot and is dead-easy to configure, supporting SASL and TLS-secured brokers.
+
+> [!WARNING]
+> The Kafdrop project does not have an official website. Please be cautious of fake websites and scams impersonating the project. The only official source is this GitHub repository.
 
 # Features
 * **View Kafka brokers** — topic and partition assignments, and controller status
@@ -24,7 +27,7 @@ This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the 
 
 # Requirements
 
-* Java 11 or newer
+* Java 17 or newer
 * Kafka (version 0.11.0 or newer) or Azure Event Hubs
 
 Optional, additional integration:
@@ -65,14 +68,14 @@ Finally, a default message and key format (e.g. to deserialize Avro messages or 
 --message.format=AVRO
 --message.keyFormat=DEFAULT
 ```
-Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages. 
+Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages.
 If key format is unspecified, message format will be used for key too.
 
 ## Configure Protobuf message type
-### Option 1: Using Protobuf Descriptor 
-In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. 
-Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). 
-Kafdrop will allow user to select descriptor and well as specifying name of one of the message type provided by the descriptor at runtime. 
+### Option 1: Using Protobuf Descriptor
+In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file.
+Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s).
+Kafdrop will allow user to select descriptor and well as specifying name of one of the message type provided by the descriptor at runtime.
 
 To configure a folder with protobuf descriptor file(s) (.desc), follow:
 ```
@@ -95,16 +98,22 @@ Launch container in background:
 ```sh
 docker run -d --rm -p 9000:9000 \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
-    -e JVM_OPTS="-Xms32M -Xmx64M" \
     -e SERVER_SERVLET_CONTEXTPATH="/" \
     obsidiandynamics/kafdrop
 ```
 
+Launch container with some specific JVM options:
+```sh
+docker run -d --rm -p 9000:9000 \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e JVM_OPTS="-Xms32M -Xmx64M" \
+    -e SERVER_SERVLET_CONTEXTPATH="/" \
+    obsidiandynamics/kafdrop
+```
 Launch container in background with protobuff definitions:
 ```sh
 docker run -d --rm -v <path_to_protobuff_descriptor_files>:/var/protobuf_desc -p 9000:9000 \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
-    -e JVM_OPTS="-Xms32M -Xmx64M" \
     -e SERVER_SERVLET_CONTEXTPATH="/" \
     -e CMD_ARGS="--message.format=PROTOBUF --protobufdesc.directory=/var/protobuf_desc" \
     obsidiandynamics/kafdrop
@@ -180,22 +189,25 @@ Starting with version 2.0.0, Kafdrop offers a set of Kafka APIs that mirror the 
 
 * `/topic`: Returns a list of all topics.
 
-## Swagger
-To help document the Kafka APIs, Swagger has been included. The Swagger output is available by default at the following Kafdrop URL:
+## OpenAPI Specification (OAS)
+To help document the Kafka APIs, OpenAPI Specification (OAS) has been included. The OpenAPI Specification output is available by default at the following Kafdrop URL:
 ```
-/v2/api-docs
+/v3/api-docs
+```
+
+It is also possible to access the Swagger UI (the HTML views) from the following URL:
+```
+/swagger-ui.html
 ```
 
 This can be overridden with the following configuration:
 ```
-springfox.documentation.swagger.v2.path=/new/swagger/path
+springdoc.api-docs.path=/new/oas/path
 ```
 
-Currently only the JSON endpoints are included in the Swagger output; the HTML views and Spring Boot debug endpoints are excluded.
-
-You can disable Swagger output with the following configuration:
+You can disable OpenAPI Specification output with the following configuration:
 ```
-swagger.enabled=false
+springdoc.api-docs.enabled=false
 ```
 
 ## CORS Headers
@@ -226,6 +238,13 @@ By default, you could create a topic. If you don't want this feature, you could 
 --topic.createEnabled=false
 ```
 
+## Message Configuration
+By default, you cannot send messages to a topic. You can enable it with:
+
+```
+--message.sendEnabled=true
+```
+
 ## Actuator
 Health and info endpoints are available at the following path: `/actuator`
 
@@ -242,6 +261,23 @@ Kafdrop supports TLS (SSL) and SASL connections for [encryption and authenticati
 * `kafka.keystore.jks`: specifying the private key to authenticate the client to the broker, if mutual TLS authentication is required.
 * `kafka.properties`: specifying the necessary configuration, including key/truststore passwords, cipher suites, enabled TLS protocol versions, username/password pairs, etc. When supplying the truststore and/or keystore files, the `ssl.truststore.location` and `ssl.keystore.location` properties will be assigned automatically.
 
+### Running from JAR
+First create a `kafka.properties` file with the following content:
+
+```yml
+security.protocol=SASL_SSL
+sasl.mechanism=SCRAM-SHA-512
+sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="foo" password="bar"
+```
+
+Then run Kafdrop with the following command:
+
+```shell
+java -jar target/kafdrop-<version>.jar \
+    --kafka.brokerConnect=<host:port,host:port> \
+    --kafka.propertiesFile=./kafka.properties
+```
+
 ### Using Docker
 The three files above can be supplied to a Docker instance in base-64-encoded form via environment variables:
 
@@ -253,24 +289,71 @@ docker run -d --rm -p 9000:9000 \
     -e KAFKA_KEYSTORE="$(cat kafka.keystore.jks | base64)" \       # optional
     obsidiandynamics/kafdrop
 ```
+
+Rather than passing `KAFKA_PROPERTIES` as a base64-encoded string, you can also place a pre-populated `KAFKA_PROPERTIES_FILE` into the container:
+
+```sh
+cat << EOF > kafka.properties
+security.protocol=SASL_SSL
+sasl.mechanism=SCRAM-SHA-512
+sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="foo" password="bar"
+EOF
+
+docker run -d --rm -p 9000:9000 \
+    -v $(pwd)/kafka.properties:/tmp/kafka.properties:ro \
+    -v $(pwd)/kafka.truststore.jks:/tmp/kafka.truststore.jks:ro \
+    -v $(pwd)/kafka.keystore.jks:/tmp/kafka.keystore.jks:ro \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e KAFKA_PROPERTIES_FILE=/tmp/kafka.properties \
+    -e KAFKA_TRUSTSTORE_FILE=/tmp/kafka.truststore.jks \   # optional
+    -e KAFKA_KEYSTORE_FILE=/tmp/kafka.keystore.jks \       # optional
+    obsidiandynamics/kafdrop
+```
+
+It's sometimes needed to load extra classes, e.g. for a SASL client callback handler. To facilitate that, it is possible to mount a folder with extra JARs, like this:
+
+```sh
+cat << EOF > kafka.properties
+security.protocol=SASL_SSL
+sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule;
+sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler
+EOF
+
+mkdir extra-kafdrop-classes
+wget --directory-prefix=extra-kafdrop-classes https://repo1.maven.org/maven2/software/amazon/msk/aws-msk-iam-auth/1.0.0/aws-msk-iam-auth-1.0.0.jar
+
+docker run -d --rm -p 9000:9000 \
+    -v $(pwd)/kafka.properties:/tmp/kafka.properties:ro \
+    -v $(pwd)/kafka.truststore.jks:/tmp/kafka.truststore.jks:ro \
+    -v $(pwd)/kafka.keystore.jks:/tmp/kafka.keystore.jks:ro \
+    -v $(pwd)/extra-kafdrop-classes:/extra-classes:ro \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e KAFKA_PROPERTIES_FILE=/tmp/kafka.properties \
+    -e KAFKA_TRUSTSTORE_FILE=/tmp/kafka.truststore.jks \   # optional
+    -e KAFKA_KEYSTORE_FILE=/tmp/kafka.keystore.jks \       # optional
+    obsidiandynamics/kafdrop
+```
+
+
 #### Environment Variables
 ##### Basic configuration
-|Name                   |Description
-|-----------------------|-------------------------------
-|`KAFKA_BROKERCONNECT`  |Bootstrap list of Kafka host/port pairs. Defaults to `localhost:9092`.
-|`KAFKA_PROPERTIES`     |Additional properties to configure the broker connection (base-64 encoded).
-|`KAFKA_TRUSTSTORE`     |Certificate for broker authentication (base-64 encoded). Required for TLS/SSL.
-|`KAFKA_KEYSTORE`       |Private key for mutual TLS authentication (base-64 encoded).
+|Name                        |Description
+|----------------------------|-------------------------------
+|`KAFKA_BROKERCONNECT`       |Bootstrap list of Kafka host/port pairs. Defaults to `localhost:9092`.
+|`KAFKA_PROPERTIES`          |Additional properties to configure the broker connection (base-64 encoded).
+|`KAFKA_TRUSTSTORE`          |Certificate for broker authentication (base-64 encoded). Required for TLS/SSL.
+|`KAFKA_KEYSTORE`            |Private key for mutual TLS authentication (base-64 encoded).
 |`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
-|`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
-|`SCHEMAREGISTRY_CONNECT `|The endpoint of Schema Registry for Avro or Protobuf message
-|`SCHEMAREGISTRY_AUTH`  |Optional basic auth credentials in the form `username:password`.
-|`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
+|`SERVER_PORT`               |The web server port to listen on. Defaults to `9000`.
+|`MANAGEMENT_SERVER_PORT`    |The Spring Actuator server port to listen on. Defaults to `9000`.
+|`SCHEMAREGISTRY_CONNECT `   |The endpoint of Schema Registry for Avro or Protobuf message
+|`SCHEMAREGISTRY_AUTH`       |Optional basic auth credentials in the form `username:password`.
+|`CMD_ARGS`                  |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`.
 
 ##### Advanced configuration
 | Name                     |Description
 |--------------------------|-------------------------------
-| `JVM_OPTS`               |JVM options.
+| `JVM_OPTS`               |JVM options. E.g.```JVM_OPTS: "-Xms16M -Xmx64M -Xss360K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"```
 | `JMX_PORT`               |Port to use for JMX. No default; if unspecified, JMX will not be exposed.
 | `HOST`                   |The hostname to report for the RMI registry (used for JMX). Defaults to `localhost`.
 | `KAFKA_PROPERTIES_FILE`  |Internal location where the Kafka properties file will be written to (if `KAFKA_PROPERTIES` is set). Defaults to `kafka.properties`.
@@ -318,7 +401,7 @@ Add a logout page in `/usr/local/opt/nginx/html/401.html`:
 Use the following snippet for `/usr/local/etc/nginx/nginx.conf`:
 ```
 worker_processes 4;
-  
+
 events {
   worker_connections 1024;
 }
@@ -372,13 +455,13 @@ To logout, browse to [/logout](http://localhost:8080/logout).
 
 # Contributing Guidelines
 
-All contributions are more than welcomed. Contributions may close an issue, fix a bug (reported or not reported), add new design blocks, improve the existing code, add new feature, and so on. In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone.
+See [here](CONTRIBUTING.md).
 
 ## Release workflow
 
 To cut an official release, these are the steps:
 
-1. Commit a new version on master that has the `-SNAPSHOT` suffix stripped (see `pom.xml`). Once the commit is merged, the CI will treat it as a release build, and will end up publishing more artifacts than the regular (non-release/snapshot) build. One of those will be a dockerhub push to the specific version and "latest" tags. (The regular build doesn't update "latest"). 
+1. Commit a new version on master that has the `-SNAPSHOT` suffix stripped (see `pom.xml`). Once the commit is merged, the CI will treat it as a release build, and will end up publishing more artifacts than the regular (non-release/snapshot) build. One of those will be a dockerhub push to the specific version and "latest" tags. (The regular build doesn't update "latest").
 
 2. You can then edit the release description in GitHub to describe what went into the release.
 

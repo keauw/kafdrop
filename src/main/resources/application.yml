@@ -20,10 +20,12 @@ spring:
   jackson:
     deserialization:
       fail_on_unknown_properties: false
-      read_unknown_enum_values_as_null: true
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
+    datatype:
+      enum:
+        read_unknown_enum_values_as_null: true
+
+springdoc:
+  enable-kotlin: false # Kafdrop does not use Kotlin; enabling it causes #803
 
 management:
   endpoints:
@@ -38,7 +40,6 @@ kafdrop.monitor:
 
 kafka:
   brokerConnect: localhost:9092
-  isSecured: false
   saslMechanism: "PLAIN"
   securityProtocol: "SASL_PLAINTEXT"
   truststoreFile: "${KAFKA_TRUSTSTORE_FILE:kafka.truststore.jks}"

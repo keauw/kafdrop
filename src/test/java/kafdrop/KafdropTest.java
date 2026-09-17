@@ -1,24 +1,25 @@
 package kafdrop;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.HttpMethod.TRACE;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.OK;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestRestTemplate
 public class KafdropTest extends AbstractIntegrationTest {
 
   @LocalServerPort
@@ -38,7 +39,7 @@ public class KafdropTest extends AbstractIntegrationTest {
   @Test
   public void getReturnsExpectedGutHubStarText() throws Exception {
     ResponseEntity<String> responseEntity = restTemplate
-            .getForEntity("http://localhost:" + port + "/", String.class);
+      .getForEntity("http://localhost:" + port + "/", String.class);
     assertEquals(OK, responseEntity.getStatusCode());
     assertThat(responseEntity.getBody().contains("Star Kafdrop on GitHub"));
   }
@@ -46,7 +47,7 @@ public class KafdropTest extends AbstractIntegrationTest {
   @Test
   public void traceMethodExpectedDisallowedReturnCode() throws Exception {
     ResponseEntity<String> response = restTemplate
-            .exchange("http://localhost:" + port + "/", TRACE, null, String.class);
-      assertEquals(METHOD_NOT_ALLOWED, response.getStatusCode());
+      .exchange("http://localhost:" + port + "/", TRACE, null, String.class);
+    assertEquals(METHOD_NOT_ALLOWED, response.getStatusCode());
   }
 }
