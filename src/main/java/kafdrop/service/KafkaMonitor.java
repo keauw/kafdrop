@@ -18,11 +18,25 @@
 
 package kafdrop.service;
 
-import kafdrop.model.*;
-import kafdrop.util.*;
-import org.apache.kafka.common.*;
+import kafdrop.model.AclVO;
+import kafdrop.model.BrokerVO;
+import kafdrop.model.ClusterSummaryVO;
+import kafdrop.model.ConsumerVO;
+import kafdrop.model.CreateMessageVO;
+import kafdrop.model.CreateTopicVO;
+import kafdrop.model.MessageVO;
+import kafdrop.model.SearchResultsVO;
+import kafdrop.model.TopicVO;
+import kafdrop.util.Deserializers;
+import kafdrop.util.Serializers;
+import org.apache.kafka.common.TopicPartition;
 
-import java.util.*;
+import org.apache.kafka.clients.producer.RecordMetadata;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 public interface KafkaMonitor {
   List<BrokerVO> getBrokers();
@@ -48,17 +62,28 @@ public interface KafkaMonitor {
 
   List<ConsumerVO> getConsumersByTopics(Collection<TopicVO> topicVos);
 
+  SearchResultsVO searchMessages(String topic,
+                                 String searchString,
+                                 Integer partition,
+                                 Integer maximumCount,
+                                 Date startTimestamp,
+                                 Deserializers deserializers);
+
   /**
    * Create topic
+   *
    * @param createTopicDto topic params
    */
   void createTopic(CreateTopicVO createTopicDto);
 
   /**
    * Delete the given topic
+   *
    * @param topic name of the topic to delete
    */
   void deleteTopic(String topic);
+
+  RecordMetadata publishMessage(CreateMessageVO message, Serializers serializers);
 
   List<AclVO> getAcls();
 }

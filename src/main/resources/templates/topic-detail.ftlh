@@ -44,6 +44,10 @@
     <a id="topic-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>">
         <i class="fa fa-eye"></i> View Messages
     </a>
+    &nbsp;&nbsp;
+    <a id="search-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/search-messages'/>">
+        <i class="fa fa-search"></i> Search Messages
+    </a>
     <#if topicDeleteEnabled>
         <form id="delete-topic-form" action="<@spring.url '/topic/${topic.name}/delete'/>" method="POST">
             <button class="btn btn-danger" type="submit"><i class="fa fa-remove"></i> Delete topic</button>
@@ -77,6 +81,13 @@
                 <tr>
                     <td>Total available messages</td>
                     <td>${topic.availableSize}</td>
+                </tr>
+                <#if topic.partitions?size gt 0>
+                    <#assign maxOffsetPartition = topic.partitions?sequence?sort_by("size")?last>
+                </#if>
+                <tr>
+                    <td>Highest end offset</td>
+                    <td><#if ((maxOffsetPartition.size)!0) gt 0>${maxOffsetPartition.size} (partition ${maxOffsetPartition.id})<#else>-</#if></td>
                 </tr>
                 </tbody>
             </table>
