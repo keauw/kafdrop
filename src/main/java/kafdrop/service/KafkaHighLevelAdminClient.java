@@ -113,7 +113,7 @@ public final class KafkaHighLevelAdminClient {
     }
 
     final var groupSpecs = groupIds.stream()
-      .collect(Collectors.toMap(Function.identity(), _ -> new ListConsumerGroupOffsetsSpec()));
+      .collect(Collectors.toMap(Function.identity(), groupId -> new ListConsumerGroupOffsetsSpec()));
     final var result = adminClient.listConsumerGroupOffsets(groupSpecs);
 
     final var offsetsByGroup = new HashMap<String, Map<TopicPartition, OffsetAndMetadata>>(groupIds.size(), 1f);

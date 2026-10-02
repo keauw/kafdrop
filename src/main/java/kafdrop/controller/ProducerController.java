@@ -36,7 +36,7 @@ public class ProducerController {
         if (allRequestParams != null) {
             for (Map.Entry<String, List<String>> paramEntry : allRequestParams.entrySet()) {
                 if ("messageKey".equalsIgnoreCase(paramEntry.getKey())) {
-                    message.setHeader(KafkaHeaders.MESSAGE_KEY, paramEntry.getValue().get(0));
+                    message.setHeader(KafkaHeaders.KEY, paramEntry.getValue().get(0));
                 } else {
                     message.setHeader(paramEntry.getKey(), paramEntry.getValue().get(0));
                 }
