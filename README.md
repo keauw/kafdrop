@@ -349,6 +349,9 @@ docker run -d --rm -p 9000:9000 \
 |`SCHEMAREGISTRY_CONNECT `   |The endpoint of Schema Registry for Avro or Protobuf message
 |`SCHEMAREGISTRY_AUTH`       |Optional basic auth credentials in the form `username:password`.
 |`CMD_ARGS`                  |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`.
+|`KAFDROP_ADMIN_ENABLED`     |Enable Admin basic authentication. Defaults to `true`.
+|`KAFDROP_USER`              |Admin basic auth username.
+|`KAFDROP_PROTECTED_KEY`     |Admin basic auth password.
 
 ##### Advanced configuration
 | Name                     |Description
