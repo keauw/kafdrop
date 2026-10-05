@@ -3,6 +3,7 @@ package kafdrop.config;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -31,12 +32,38 @@ public final class KafkaConfiguration {
   private String truststoreFile;
   private String propertiesFile;
   private String keystoreFile;
+  private String jaasConfig;
+  private String clientCallback;
+  private String iamEnabled;
+  private String saslEnabled;
+
 
   public void applyCommon(Properties properties) {
     properties.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokerConnect);
 
     if (securityProtocol.equals("SSL")) {
       properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
+    }
+
+    LOG.info("Is SASL enabled : {}", saslEnabled);
+    if (Boolean.parseBoolean(saslEnabled)) {
+      LOG.info("Setting sasl.jaas.config {}", jaasConfig);
+      LOG.info("Setting security protocol to {}", securityProtocol);
+      LOG.info("Setting sasl mechanism to {}", saslMechanism);
+      properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
+      properties.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
+      properties.put(SaslConfigs.SASL_JAAS_CONFIG, jaasConfig);
+    }
+
+    LOG.info("Is iam enabled : {}", iamEnabled);
+    if (Boolean.parseBoolean(iamEnabled)) {
+      LOG.info("Setting sasl.jaas.config {} and sasl and callback callback properties {}", jaasConfig, clientCallback);
+      LOG.info("Setting security protocol to {}", securityProtocol);
+      LOG.info("Setting sasl mechanism to {}", saslMechanism);
+      properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
+      properties.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
+      properties.put(SaslConfigs.SASL_CLIENT_CALLBACK_HANDLER_CLASS, clientCallback);
+      properties.put(SaslConfigs.SASL_JAAS_CONFIG, jaasConfig);
     }
 
     LOG.info("Checking truststore file {}", truststoreFile);
